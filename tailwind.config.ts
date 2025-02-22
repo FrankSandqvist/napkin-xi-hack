@@ -13,6 +13,10 @@ export default {
         foreground: "var(--foreground)",
       },
     },
+    fontFamily: {
+      rowdies: ["Rowdies"],
+      sans: ["system-ui", "sans-serif"],
+    },
   },
   plugins: [],
 } satisfies Config;

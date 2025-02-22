@@ -14,7 +14,7 @@ export default function Home() {
         <ClientConversation />
       </div>
       <div className="absolute bottom-0 w-full flex flex-col items-center">
-        <div className="bg-white p-6">NAPKIN</div>
+        <div className="bg-white p-6 font-rowdies text-4xl">NAPKIN</div>
       </div>
     </div>
   );

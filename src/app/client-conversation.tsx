@@ -1,8 +1,9 @@
 "use client";
 
+import { productSchema } from "@/schemas/product";
 import { useConversation } from "@11labs/react";
-import { useChat, useCompletion } from "@ai-sdk/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { z } from "zod";
 
 export function ClientConversation() {
   const conversation = useConversation({
@@ -13,6 +14,25 @@ export function ClientConversation() {
   });
 
   const startConversation = useCallback(async () => {
+    const products = JSON.parse(localStorage.getItem("products")!) as z.infer<
+      typeof productSchema
+    >[];
+    console.log(`You are a support agent named Eric. 
+
+You can access the calculate tool to calculate prices for the customer, when you have everything you need.
+
+Here are the products, and what parameters gather from the customer.
+${products.map(
+  (product, idx) =>
+    `${idx}. ${product.productName}
+${product.signature.map(
+  (signature) => `${signature.name}: ${signature.type}
+`
+)}
+`
+)}
+`);
+
     try {
       // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -21,25 +41,34 @@ export function ClientConversation() {
       await conversation.startSession({
         agentId: "ZF0EjZxj04nFzA35uymt",
         clientTools: {
-          calculate: ({ parameters }: any) => {
-            console.log(parameters);
-            const func = new Function("parameters", code)
-            
-            return func(JSON.parse(parameters));
+          calculate: ({ params, productIdx }: any) => {
+            console.log(params, productIdx);
+            const code = JSON.parse(localStorage.getItem("products")!)[
+              productIdx
+            ].code;
+            const func = new Function("params", code);
+
+            return func(JSON.parse(params));
           },
         },
         overrides: {
           agent: {
             prompt: {
-              prompt: `You are a support agent named Eric. You can access the calculate tool to calculate prices for the customer.
-              
-The signature of the parameters of the calculate function is:
-{
-  width: number,
-  height: number,
-  supplierPrice: number,
-  order: number
-}`,
+              prompt: `You are a support agent named Eric. 
+
+You can access the calculate tool to calculate prices for the customer, when you have everything you need.
+
+Here are the products, and what parameters gather from the customer.
+${products
+  .map(
+    (product, idx) =>
+      `${idx}. ${product.productName}
+${product.signature
+  .map((signature) => `${signature.name}: ${signature.type}`)
+  .join("\n")}`
+  )
+  .join("\n")}
+`,
             },
           },
         },
@@ -74,21 +103,3 @@ The signature of the parameters of the calculate function is:
     </div>
   );
 }
-
-const code = `
-const width = parameters.width;
-const height = parameters.height;
-const supplierPrice = parameters.supplierPrice;
-const order = parameters.order;
-
-const profitMargin = 2 * supplierPrice + 20;
-const squareMeterPrice = supplierPrice + profitMargin;
-
-let price = width * height * squareMeterPrice;
-
-if (order > 10) {
-    price = price - (price * 0.2); // apply twenty percent discount
-}
-
-return price;
-`;
