@@ -35,7 +35,7 @@ export const ProductListing = dynamic(
               </Link>
             ))}
             <button
-              className="bg-gradient-to-br from-black via-black to-teal-700 text-white py-4 px-6 text-start group"
+              className="bg-gradient-to-br from-black via-black to-emerald-700 text-white py-4 px-6 text-start group"
               onClick={() => {
                 const idx = FakeDB.addProduct({
                   productName: "",

@@ -3,7 +3,7 @@ import { Kode_Mono, Rowdies } from "next/font/google";
 import "./globals.css";
 import { ClientConversation } from "../components/client-conversation";
 
-const _ =Rowdies({
+const _ = Rowdies({
   weight: "400",
   subsets: ["latin"],
 });
@@ -32,7 +32,6 @@ export default function RootLayout({
               <div className="flex-grow" />
             </div>
           </div>
-
           <ClientConversation />
         </div>
       </body>

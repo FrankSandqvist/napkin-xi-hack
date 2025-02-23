@@ -28,7 +28,6 @@ export const ClientConversation = dynamic(
             agentId: "ZF0EjZxj04nFzA35uymt",
             clientTools: {
               calculate: ({ params, productIdx }: any) => {
-                console.log(params, productIdx);
                 const code = JSON.parse(localStorage.getItem("products")!)[
                   productIdx
                 ].code;

@@ -31,8 +31,6 @@ const EditProduct = dynamic(
         );
         const router = useRouter();
 
-        console.log(product);
-
         const [messages, setMessages] = useState<Array<[boolean, string]>>([]);
         const messagesRef = useRef(messages);
         const productRef = useRef(product);
@@ -47,7 +45,6 @@ const EditProduct = dynamic(
           api: "/api/code",
           schema: codeGenObjectSchema,
           onFinish: (object) => {
-            console.log(object);
             if (object.object === undefined) {
               console.error(object.error);
               return;
@@ -67,7 +64,6 @@ const EditProduct = dynamic(
           onConnect: () => console.log("Connected"),
           onDisconnect: () => console.log("Disconnected"),
           onMessage: (message: any) => {
-            console.log("Message:", message);
             setMessages((prevMessages) => [
               ...prevMessages,
               [message.source === "ai", message.message],
@@ -82,20 +78,12 @@ const EditProduct = dynamic(
 
         const startConversation = useCallback(async () => {
           try {
-            // Request microphone permission
             await navigator.mediaDevices.getUserMedia({ audio: true });
 
-            // Start the conversation with your agent
             await conversation.startSession({
               agentId: "1iMLmMFoTYF77Yzjr5NA",
               clientTools: {
-                // takeNote: ({ note }: any) => {
-                //   console.log(productRef?.productName);
-                //   setNotes((prevNotes) => [...prevNotes, note]);
-                // },
                 generateCode: async () => {
-                  console.log("Generate code");
-                  console.log(messagesRef.current, productRef.current);
                   codeCompletion.submit({
                     messages: messagesRef.current,
                     editingProduct: productRef.current?.draft
@@ -105,7 +93,6 @@ const EditProduct = dynamic(
                   await new Promise((resolve) => setTimeout(resolve, 4000));
                 },
                 setName: ({ name }: any) => {
-                  console.log(name);
                   setProduct((p) =>
                     FakeDB.editProduct(productIdx, {
                       ...p,
@@ -169,6 +156,10 @@ Pricing explanation: ${productRef.current.explanation}`
             <h2 className="text-2xl font-rowdies mb-4">
               Let's build your pricing.
             </h2>
+            <p className="mr-8">
+              This page allows you to create the pricing function for your
+              product, so the pricing agent can give quotes to your customers.
+            </p>
             <div className="relative flex flex-col gap-2 overflow-y-auto pb-8 max-h-64">
               {messages
                 .map((v, i) => [v, i] as const)
@@ -192,7 +183,11 @@ Pricing explanation: ${productRef.current.explanation}`
                   ? startConversation
                   : stopConversation
               }
-              className={`relative text-white bg-black -mx-6 lg:mx-0 mb-8`}
+              className={`relative text-white bg-black -mx-6 lg:mx-0 mb-8 shadow-emerald-400 duration-200 ${
+                conversation.status !== "connected"
+                  ? `shadow-md`
+                  : `shadow-none`
+              }`}
             >
               <div
                 className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-yellow-700 mix-blend-screen ${
@@ -216,56 +211,66 @@ Pricing explanation: ${productRef.current.explanation}`
                   <StopCircleIcon className="w-5 h-5 mr-2" />
                 )}
                 {conversation.status === "disconnected"
-                  ? "START BUILDING"
+                  ? productRef.current.draft === false
+                    ? "TAP TO START EDITING"
+                    : "TAP TO START BUILDING"
                   : "STOP BUILDING"}
               </div>
             </button>
-            <h2 className="text-2xl font-rowdies mb-4">
-              How do we price this?
-            </h2>
-            <div className="text-sm mb-4">
-              We depend on the following factors:
-            </div>
-            <div className=" flex flex-row flex-wrap gap-4 text-sm mb-4">
-              {(codeCompletion.object?.signature ?? product.signature).map(
-                (signature, index) => {
-                  if (!signature) return null;
-                  return (
-                    <div
-                      className="flex flex-row text-nowrap bg-slate-100 border border-black px-2 py-1"
-                      key={index}
-                    >
-                      {{
-                        string: <Text className="w-5 h-5 align-middle mr-2" />,
-                        boolean: (
-                          <ToggleLeft className="w-5 h-5 align-middle mr-2" />
-                        ),
-                        number: <Hash className="w-5 h-5 align-middle mr-2" />,
-                      }[signature.type!] ?? null}
-                      {signature.prettyName}
-                    </div>
-                  );
-                }
-              )}
-            </div>
-            <div className=" whitespace-pre-wrap text-sm mb-8">
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => <p className="">{children}</p>,
-                  ul: ({ children }) => (
-                    <ul className="list-disc list-inside">{children}</ul>
-                  ),
-                  li: ({ children }) => <li className="">{children}</li>,
-                }}
-              >
-                {codeCompletion.object?.explanation ?? product.explanation}
-              </ReactMarkdown>
-            </div>
-              <div className="bg-slate-950 text-white font-kodeMono text-sm -mx-6 lg:-mx-12 px-4 py-8 overflow-y-scroll whitespace-pre-wrap mb-32">
-                {codeCompletion.object?.code ||
-                  product.code ||
-                  "This is where the magic code sauce will go."}
-            </div>
+            {productRef.current.draft === false && (
+              <>
+                <h2 className="text-2xl font-rowdies mb-4">
+                  How do we price this?
+                </h2>
+                <div className="text-sm mb-4">
+                  We depend on the following factors:
+                </div>
+                <div className=" flex flex-row flex-wrap gap-4 text-sm mb-4">
+                  {(codeCompletion.object?.signature ?? product.signature).map(
+                    (signature, index) => {
+                      if (!signature) return null;
+                      return (
+                        <div
+                          className="flex flex-row text-nowrap bg-slate-100 border border-black px-2 py-1"
+                          key={index}
+                        >
+                          {{
+                            string: (
+                              <Text className="w-5 h-5 align-middle mr-2" />
+                            ),
+                            boolean: (
+                              <ToggleLeft className="w-5 h-5 align-middle mr-2" />
+                            ),
+                            number: (
+                              <Hash className="w-5 h-5 align-middle mr-2" />
+                            ),
+                          }[signature.type!] ?? null}
+                          {signature.prettyName}
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+                <div className=" whitespace-pre-wrap text-sm mb-8">
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => <p className="">{children}</p>,
+                      ul: ({ children }) => (
+                        <ul className="list-disc list-inside">{children}</ul>
+                      ),
+                      li: ({ children }) => <li className="">{children}</li>,
+                    }}
+                  >
+                    {codeCompletion.object?.explanation ?? product.explanation}
+                  </ReactMarkdown>
+                </div>
+                <div className="bg-slate-950 text-white font-kodeMono text-sm -mx-6 lg:-mx-12 px-4 py-8 overflow-y-scroll whitespace-pre-wrap mb-32">
+                  {codeCompletion.object?.code ||
+                    product.code ||
+                    "This is where the magic code sauce will go."}
+                </div>
+              </>
+            )}
           </div>
         );
       }
