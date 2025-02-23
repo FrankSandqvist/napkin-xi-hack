@@ -124,16 +124,20 @@ Don't overcomplicate it, if the user knows their pricing, generate the code acco
 
 Please be as conicse as possible, and ask the right questions to get the information you need.
 
+Get the name of the service first, if you don't have it.
+
+Product name: ${productRef.current.productName || "NOT YET SET"}
 ${
   productRef.current.draft === false
     ? `We are currently editing this product:
-Product name: ${productRef.current.productName}
 Pricing explanation: ${productRef.current.explanation}`
     : ``
 }`,
                   },
                   firstMessage: productRef.current.draft
-                    ? "All right, let's get started. What's the name of your product or service?"
+                    ? productRef.current.productName
+                      ? "All right, let's get started! How do you price this service?"
+                      : "Let's get started. What's the name of your product or service?"
                     : `Let's fine-tune the pricing for ${productRef.current.productName}.`,
                 },
               },
@@ -146,7 +150,7 @@ Pricing explanation: ${productRef.current.explanation}`
         return (
           <div className="flex flex-col items-stretch">
             <div className="mb-12">
-              <h1 className="font-rowdies text-4xl bg-black -mx-12 text-white py-2 px-12 mb-4 flex flex-row gap-2 items-center group">
+              <h1 className="font-rowdies text-4xl bg-black -mx-6 lg:-mx-12 text-white py-2 px-12 mb-4 flex flex-row gap-2 items-center group">
                 <Link href="/">
                   <ArrowLeft className="mr-4 text-white -ml-4 duration-300 opacity-50 group-hover:ml-0 group-hover:opacity-100" />
                 </Link>
@@ -166,18 +170,21 @@ Pricing explanation: ${productRef.current.explanation}`
               Let's build your pricing.
             </h2>
             <div className="relative flex flex-col gap-2 overflow-y-auto pb-8 max-h-64">
-              {messages.map((v,i) => [v,i] as const).toReversed().map(([[isAi, message], originalIndex]) => (
-                <div
-                  key={originalIndex}
-                  className={`p-2 border w-[90%] animate-appear-from-bottom text-sm ${
-                    isAi
-                      ? `self-start bg-slate-100 border-black`
-                      : `self-end bg-black text-white`
-                  }`}
-                >
-                  {message}
-                </div>
-              ))}
+              {messages
+                .map((v, i) => [v, i] as const)
+                .toReversed()
+                .map(([[isAi, message], originalIndex]) => (
+                  <div
+                    key={originalIndex}
+                    className={`p-2 border w-[90%] animate-appear-from-bottom text-sm ${
+                      isAi
+                        ? `self-start bg-slate-100 border-black`
+                        : `self-end bg-black text-white`
+                    }`}
+                  >
+                    {message}
+                  </div>
+                ))}
             </div>
             <button
               onClick={
@@ -185,7 +192,7 @@ Pricing explanation: ${productRef.current.explanation}`
                   ? startConversation
                   : stopConversation
               }
-              className={`relative text-white bg-black -mx-6 mb-8`}
+              className={`relative text-white bg-black -mx-6 lg:mx-0 mb-8`}
             >
               <div
                 className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-yellow-700 mix-blend-screen ${
@@ -216,7 +223,7 @@ Pricing explanation: ${productRef.current.explanation}`
             <h2 className="text-2xl font-rowdies mb-4">
               How do we price this?
             </h2>
-            <div className="text-sm mb-2">
+            <div className="text-sm mb-4">
               We depend on the following factors:
             </div>
             <div className=" flex flex-row flex-wrap gap-4 text-sm mb-4">
@@ -225,41 +232,39 @@ Pricing explanation: ${productRef.current.explanation}`
                   if (!signature) return null;
                   return (
                     <div
-                      className="flex flex-row gap-2 text-nowrap"
+                      className="flex flex-row text-nowrap bg-slate-100 border border-black px-2 py-1"
                       key={index}
                     >
-                      {
-                        {
-                          string: (
-                            <Text className="w-5 h-5 align-middle mr-2" />
-                          ),
-                          boolean: (
-                            <ToggleLeft className="w-5 h-5 align-middle mr-2" />
-                          ),
-                          number: (
-                            <Hash className="w-5 h-5 align-middle mr-2" />
-                          ),
-                        }[signature.type!]
-                      }
+                      {{
+                        string: <Text className="w-5 h-5 align-middle mr-2" />,
+                        boolean: (
+                          <ToggleLeft className="w-5 h-5 align-middle mr-2" />
+                        ),
+                        number: <Hash className="w-5 h-5 align-middle mr-2" />,
+                      }[signature.type!] ?? null}
                       {signature.prettyName}
                     </div>
                   );
                 }
               )}
             </div>
-            <div className=" whitespace-pre-wrap text-sm">
-              <ReactMarkdown>
+            <div className=" whitespace-pre-wrap text-sm mb-8">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p className="">{children}</p>,
+                  ul: ({ children }) => (
+                    <ul className="list-disc list-inside">{children}</ul>
+                  ),
+                  li: ({ children }) => <li className="">{children}</li>,
+                }}
+              >
                 {codeCompletion.object?.explanation ?? product.explanation}
               </ReactMarkdown>
             </div>
-            <div className="relative -mx-12 bg-slate-950 text-white font-kodeMono text-sm  h-64">
-              <div className="absolute top-0 left-0 right-0 h-8 from-transparent to-slate-950 bg-gradient-to-t z-10" />
-              <div className="absolute bottom-0 left-0 right-0 h-8 from-transparent to-slate-950 bg-gradient-to-b z-10" />
-              <div className="absolute w-full h-full px-4 py-8 overflow-y-scroll whitespace-pre-wrap">
+              <div className="bg-slate-950 text-white font-kodeMono text-sm -mx-6 lg:-mx-12 px-4 py-8 overflow-y-scroll whitespace-pre-wrap mb-32">
                 {codeCompletion.object?.code ||
                   product.code ||
                   "This is where the magic code sauce will go."}
-              </div>
             </div>
           </div>
         );

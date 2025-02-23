@@ -46,7 +46,7 @@ You can access the calculate tool to calculate prices for the customer, when you
 
 Here are the products, and what parameters gather from the customer.
 ${products
-  .map(
+  .filter(p => !p.draft).map(
     (product, idx) =>
       `${idx}. ${product.productName}
 ${product.signature

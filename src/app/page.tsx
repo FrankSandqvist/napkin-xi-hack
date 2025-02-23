@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <div className="mb-12">
-        <h1 className="font-rowdies text-4xl bg-black -mx-12 text-white py-2 px-12 mb-4">
+        <h1 className="font-rowdies text-4xl bg-black -mx-6 lg:-mx-12 text-white py-2 px-12 mb-4">
           NAPKIN
         </h1>
         <div>

@@ -18,9 +18,9 @@ export const ProductListing = dynamic(
       const router = useRouter();
 
       return (
-        <div className="w-full flex flex-col items-stretch  gap-4">
+        <div className="w-full flex flex-col items-stretch gap-4">
           <h1 className="font-rowdies text-2xl">My products</h1>
-          <div className="grid grid-cols-2 gap-2 -mx-12 font-rowdies">
+          <div className="grid grid-cols-2 gap-2 lg:-mx-12">
             {products.map((product, index) => (
               <Link
                 key={index}
@@ -28,7 +28,8 @@ export const ProductListing = dynamic(
                 href={`/${index}`}
               >
                 <div className="relative">
-                  {product.productName}
+                  <div className="font-rowdies ">{product.productName}</div>
+            {product.draft && <div className="text-sm uppercase font-semibold opacity-50">Draft</div>}
                   <ArrowRight className="absolute w-5 right-0 top-0 bottom-0 opacity-0 -translate-x-4 group-hover:translate-x-0 group-hover:opacity-100 duration-300" />
                 </div>
               </Link>
@@ -46,7 +47,7 @@ export const ProductListing = dynamic(
                 router.push(`/${idx}`);
               }}
             >
-              <div className="relative">
+              <div className="relative font-rowdies">
                 Add a new product
                 <Plus className="absolute w-5 right-0 top-0 bottom-0 opacity-50 group-hover:opacity-100 duration-300" />
               </div>
