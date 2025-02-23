@@ -1,12 +1,10 @@
 "use client";
 
-import { productSchema } from "@/schemas/product";
 import { FakeDB } from "@/utils/fake-db";
 import { useConversation } from "@11labs/react";
-import { Phone, PhoneCall, PhoneOff } from "lucide-react";
+import { Phone, PhoneOff } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useState } from "react";
-import { z } from "zod";
+import { useCallback } from "react";
 
 export const ClientConversation = dynamic(
   () =>
