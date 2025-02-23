@@ -51,10 +51,10 @@ const SEED = [
       { prettyName: "Width of the Pool", name: "width", type: "number" },
       { prettyName: "Height of the Pool", name: "height", type: "number" },
     ],
-    code: "const area = params.width * params.height;\nconst variableCost = area * 70;\nconst totalCost = variableCost + 40;\nreturn totalCost;",
+    code: "const area = params.width * params.height;\nconst variableCost = area * 10;\nconst totalCost = variableCost + 40;\nreturn totalCost;",
     draft: false,
     explanation:
-      "- The price calculation starts by determining the area of the pool, which is done by multiplying the width and height of the pool.\n- This area is then multiplied by 70 euros to calculate the variable cost, which is based on the size of the pool.\n- A fixed fee of 40 euros is added to this variable cost to get the total cost.\n- The total cost is the final price for the pool cleaning service.",
+      "- The price calculation starts by determining the area of the pool, which is done by multiplying the width and height of the pool.\n- This area is then multiplied by 10 euros to calculate the variable cost, which is based on the size of the pool.\n- A fixed fee of 40 euros is added to this variable cost to get the total cost.\n- The total cost is the final price for the pool cleaning service.",
   },
   {
     productName: "Printed mugs",
