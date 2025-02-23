@@ -3,11 +3,11 @@ import { Kode_Mono, Rowdies } from "next/font/google";
 import "./globals.css";
 import { ClientConversation } from "../components/client-conversation";
 
-const r =Rowdies({
+const _ =Rowdies({
   weight: "400",
   subsets: ["latin"],
 });
-const k = Kode_Mono({
+const __ = Kode_Mono({
   weight: "400",
   subsets: ["latin"],
 });

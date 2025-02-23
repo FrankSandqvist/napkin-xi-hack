@@ -21,7 +21,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { useRouter } from "next/navigation";
 
-export const EditProduct = dynamic(
+const EditProduct = dynamic(
   () =>
     Promise.resolve(
       ({ params }: { params: Promise<{ productIdx: number }> }) => {
