@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { Rowdies } from "next/font/google";
+import { Kode_Mono, Rowdies } from "next/font/google";
 import "./globals.css";
+import { ClientConversation } from "../components/client-conversation";
 
-const rowdies = Rowdies({
+const r =Rowdies({
+  weight: "400",
+  subsets: ["latin"],
+});
+const k = Kode_Mono({
   weight: "400",
   subsets: ["latin"],
 });
@@ -19,10 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body className={`antialiased`}>
+        <div className="absolute left-0 top-0 bottom-0 right-0 flex items-stretch justify-center bg-slate-100">
+          <div className="flex flex-col w-[40rem] overflow-y-scroll px-12">
+            <div className="flex flex-col bg-slate-50 border-l border-r border-black px-6 pt-12 flex-grow">
+              {children}
+              <div className="flex-grow" />
+            </div>
+          </div>
+
+          <ClientConversation />
+        </div>
       </body>
     </html>
   );
