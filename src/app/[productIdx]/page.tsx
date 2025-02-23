@@ -8,9 +8,18 @@ import { z } from "zod";
 import { productSchema } from "@/schemas/product";
 import { FakeDB } from "@/utils/fake-db";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Hash, HelpCircle, Text, ToggleLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  Hash,
+  SparklesIcon,
+  StopCircleIcon,
+  Text,
+  ToggleLeft,
+  Trash,
+} from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import { useRouter } from "next/navigation";
 
 export const EditProduct = dynamic(
   () =>
@@ -20,19 +29,11 @@ export const EditProduct = dynamic(
         const [product, setProduct] = useState<z.infer<typeof productSchema>>(
           FakeDB.getProduct(productIdx)
         );
+        const router = useRouter();
 
         console.log(product);
 
-        const [messages, setMessages] = useState<Array<[boolean, string]>>([
-          [true, "Welcome to the product editor."],
-          [false, "You can start by setting the product name."],
-          [true, "Then, you can explain how the pricing works."],
-          [
-            false,
-            "Finally, you can generate the code based on the discussion.",
-          ],
-          [true, "If you need help, just ask."],
-        ]);
+        const [messages, setMessages] = useState<Array<[boolean, string]>>([]);
         const messagesRef = useRef(messages);
         const productRef = useRef(product);
         useEffect(() => {
@@ -145,25 +146,29 @@ Pricing explanation: ${productRef.current.explanation}`
         return (
           <div className="flex flex-col items-stretch">
             <div className="mb-12">
-              <h1 className="font-rowdies text-4xl bg-black -mx-12 text-white py-2 px-12 mb-4 flex flex-row gap-2 items-center">
+              <h1 className="font-rowdies text-4xl bg-black -mx-12 text-white py-2 px-12 mb-4 flex flex-row gap-2 items-center group">
                 <Link href="/">
-                  <ArrowLeft className="mr-4 text-white" />
+                  <ArrowLeft className="mr-4 text-white -ml-4 duration-300 opacity-50 group-hover:ml-0 group-hover:opacity-100" />
                 </Link>
                 {productRef.current.productName || "New product"}
+                <div className="flex-grow" />
+                <button
+                  onClick={() => {
+                    FakeDB.deleteProduct(productIdx);
+                    router.push("/");
+                  }}
+                >
+                  <Trash className="mr-4 w-4 h-4 text-white opacity-50 duration-300 group-hover:opacity-100" />
+                </button>
               </h1>
             </div>
-
-            <h1 className="text-white font-rowdies text-2xl">
-              {productRef.current.productName || "New product"}
-            </h1>
             <h2 className="text-2xl font-rowdies mb-4">
               Let's build your pricing.
             </h2>
             <div className="relative flex flex-col gap-2 overflow-y-auto pb-8 max-h-64">
-              <div className="absolute bg-gradient-to-b from-transparent to-slate-50 left-0 right-0 bottom-0 h-8" />
-              {messages.toReversed().map(([isAi, message]) => (
+              {messages.map((v,i) => [v,i] as const).toReversed().map(([[isAi, message], originalIndex]) => (
                 <div
-                  key={message}
+                  key={originalIndex}
                   className={`p-2 border w-[90%] animate-appear-from-bottom text-sm ${
                     isAi
                       ? `self-start bg-slate-100 border-black`
@@ -180,27 +185,34 @@ Pricing explanation: ${productRef.current.explanation}`
                   ? startConversation
                   : stopConversation
               }
-              className={`relative text-white bg-black -mx-6`}
+              className={`relative text-white bg-black -mx-6 mb-8`}
             >
               <div
-                className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-500 via-black to-emerald-500 mix-blend-screen ${
-                  conversation.status === "connected"
+                className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-yellow-700 mix-blend-screen ${
+                  conversation.status === "connected" && conversation.isSpeaking
                     ? "opacity-100"
                     : "opacity-0"
                 }`}
               />
-              <div className="px-4 py-2">
+              <div
+                className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-emerald-500 mix-blend-screen ${
+                  conversation.status === "connected" &&
+                  !conversation.isSpeaking
+                    ? "opacity-100"
+                    : "opacity-0 hover:opacity-50"
+                }`}
+              />
+              <div className="px-4 py-2 font-rowdies text-xl flex flex-row items-center justify-center">
+                {conversation.status === "disconnected" ? (
+                  <SparklesIcon className="w-5 h-5 mr-2" />
+                ) : (
+                  <StopCircleIcon className="w-5 h-5 mr-2" />
+                )}
                 {conversation.status === "disconnected"
-                  ? "Start building"
-                  : "Stop building"}
+                  ? "START BUILDING"
+                  : "STOP BUILDING"}
               </div>
             </button>
-            <div className="flex flex-col items-center">
-              <p>Status: {conversation.status}</p>
-              <p>
-                Agent is {conversation.isSpeaking ? "speaking" : "listening"}
-              </p>
-            </div>
             <h2 className="text-2xl font-rowdies mb-4">
               How do we price this?
             </h2>

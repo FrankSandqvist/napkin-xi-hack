@@ -3,6 +3,7 @@
 import { productSchema } from "@/schemas/product";
 import { FakeDB } from "@/utils/fake-db";
 import { useConversation } from "@11labs/react";
+import { Phone, PhoneCall, PhoneOff } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import { z } from "zod";
@@ -10,10 +11,6 @@ import { z } from "zod";
 export const ClientConversation = dynamic(
   () =>
     Promise.resolve(() => {
-      const [products] = useState<Array<z.infer<typeof productSchema>>>(
-        FakeDB.listProducts()
-      );
-
       const conversation = useConversation({
         onConnect: () => console.log("Connected"),
         onDisconnect: () => console.log("Disconnected"),
@@ -22,21 +19,7 @@ export const ClientConversation = dynamic(
       });
 
       const startConversation = useCallback(async () => {
-        console.log(`You are a support agent named Eric. 
-
-You can access the calculate tool to calculate prices for the customer, when you have everything you need.
-
-Here are the products, and what parameters gather from the customer.
-${products.map(
-  (product, idx) =>
-    `${idx}. ${product.productName}
-${product.signature.map(
-  (signature) => `${signature.name}: ${signature.type}
-`
-)}
-`
-)}
-`);
+        const products = FakeDB.listProducts();
 
         try {
           // Request microphone permission
@@ -88,22 +71,57 @@ ${product.signature
       }, [conversation]);
 
       return (
-        <div className="absolute flex flex-col items-center gap-4 left-0 right-0 bottom-0">
-          <div className="w-[26rem] flex items-end justify-center gap-2 from-transparent to-white bg-gradient-to-b h-32">
+        <>
+          <div
+            className={`fixed w-full h-full duration-500 bg-white/50 backdrop-blur-lg z-40 ${
+              conversation.status === "disconnected"
+                ? `pointer-events-none opacity-0`
+                : `opacity-100`
+            }`}
+          />
+          <div className="absolute flex flex-col items-center gap-4 left-0 right-0 bottom-0 z-50">
             <button
               onClick={
                 conversation.status === "disconnected"
                   ? startConversation
                   : stopConversation
               }
-              className="px-4 py-2 bg-black text-white"
+              className={`relative  bg-black text-white border-l-2 border-t-2 border-r-2 border-white`}
             >
-              {conversation.status === "disconnected"
-                ? "Test Customer Conversation"
-                : "End Conversation"}
+              <div
+                className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-yellow-700 mix-blend-screen ${
+                  conversation.status === "connected" && conversation.isSpeaking
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
+              />
+              <div
+                className={`absolute w-full h-full duration-1000 bg-gradient-to-br from-slate-800 via-black to-emerald-500 mix-blend-screen ${
+                  conversation.status === "connected" &&
+                  !conversation.isSpeaking
+                    ? "opacity-100"
+                    : "opacity-0 hover:opacity-50"
+                }`}
+              />
+              <div
+                className={`flex flex-row items-center gap-4 font-rowdies text-xl duration-500 px-6 pt-4 pb-8 ${
+                  conversation.status === "disconnected"
+                    ? `hover:pb-12`
+                    : `pb-32`
+                }`}
+              >
+                {conversation.status === "disconnected" ? (
+                  <Phone />
+                ) : (
+                  <PhoneOff />
+                )}
+                {conversation.status === "disconnected"
+                  ? "CALL IN AS CUSTOMER"
+                  : "END CUSTOMER CALL"}
+              </div>
             </button>
           </div>
-        </div>
+        </>
       );
     }),
   {

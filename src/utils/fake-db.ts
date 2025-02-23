@@ -4,8 +4,8 @@ import { z } from "zod";
 export const FakeDB = {
   listProducts: () => {
     return localStorage.getItem("products")
-      ? JSON.parse(localStorage.getItem("products")!)
-      : [];
+      ? JSON.parse(localStorage.getItem("products")!) as z.infer<typeof productSchema>[]
+      : [] as z.infer<typeof productSchema>[];
   },
   addProduct: (product: z.infer<typeof productSchema>) => {
     const products = FakeDB.listProducts();
@@ -27,5 +27,11 @@ export const FakeDB = {
     console.log(FakeDB.listProducts());
     console.log(idx);
     return FakeDB.listProducts()[idx];
+  },
+  deleteProduct: (idx: number) => {
+    const products = FakeDB.listProducts();
+    products.splice(idx, 1);
+    localStorage.setItem("products", JSON.stringify(products));
+    return products;
   },
 };

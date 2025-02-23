@@ -2,7 +2,7 @@
 
 import { productSchema } from "@/schemas/product";
 import { FakeDB } from "@/utils/fake-db";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ export const ProductListing = dynamic(
             {products.map((product, index) => (
               <Link
                 key={index}
-                className="bg-black text-white p-2 group"
+                className="bg-black text-white py-4 px-6 group"
                 href={`/${index}`}
               >
                 <div className="relative">
@@ -34,7 +34,7 @@ export const ProductListing = dynamic(
               </Link>
             ))}
             <button
-              className="bg-emerald-950 text-white p-2 text-start"
+              className="bg-gradient-to-br from-black via-black to-teal-700 text-white py-4 px-6 text-start group"
               onClick={() => {
                 const idx = FakeDB.addProduct({
                   productName: "",
@@ -46,7 +46,10 @@ export const ProductListing = dynamic(
                 router.push(`/${idx}`);
               }}
             >
-              Add new product
+              <div className="relative">
+                Add a new product
+                <Plus className="absolute w-5 right-0 top-0 bottom-0 opacity-50 group-hover:opacity-100 duration-300" />
+              </div>
             </button>
           </div>
         </div>
