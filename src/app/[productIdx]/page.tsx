@@ -156,7 +156,7 @@ Pricing explanation: ${productRef.current.explanation}`
             <h2 className="text-2xl font-rowdies mb-4">
               Let's build your pricing.
             </h2>
-            <p className="mr-8">
+            <p className="mb-8">
               This page allows you to create the pricing function for your
               product, so the pricing agent can give quotes to your customers.
             </p>
